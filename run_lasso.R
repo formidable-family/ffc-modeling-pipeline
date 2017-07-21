@@ -1,6 +1,11 @@
 library(tidyverse)
 library(doParallel)
-registerDoParallel(cores = parallel::detectCores())
+registerDoParallel(cores = parallel::detectCores(logical = FALSE))
+
+# for more info on
+# cv.glmnet with parallel = TRUE and doParallel package:
+# https://stackoverflow.com/a/21710769
+# https://stackoverflow.com/a/29001039
 
 source("models/lasso.R")
 
