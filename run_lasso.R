@@ -1,4 +1,7 @@
 library(tidyverse)
+library(doParallel)
+registerDoParallel(cores = parallel::detectCores())
+
 source("models/lasso.R")
 
 # data ----
@@ -30,7 +33,7 @@ families <- as.list(c(rep("gaussian", 3),
                       rep("binomial", 3)))
 
 prediction_list <- 
-  Map(f = function(...) lasso(data = ffc, ...), 
+  Map(f = function(...) lasso(data = ffc, ..., parallel = TRUE), 
       outcome = outcomes, 
       covariates = covariates, 
       family = families)

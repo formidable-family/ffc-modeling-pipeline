@@ -1,6 +1,6 @@
 library(glmnet)
 
-lasso <- function(data, outcome, covariates, family = "gaussian") {
+lasso <- function(data, outcome, covariates, family = "gaussian", ...) {
   # build covariate matrix and response vector
   f <- as.formula(paste0(outcome, " ~ ", paste0(covariates, collapse = " + ")))
   x <- model.matrix(f, data = data)[, -1]
@@ -17,7 +17,7 @@ lasso <- function(data, outcome, covariates, family = "gaussian") {
   # fit lasso model
   # alpha = 1 by default
   # (alpha is the mixing parameter for elastic net, so 1 = lasso)
-  model_fit <- cv.glmnet(x = x, y = y, family = family)
+  model_fit <- cv.glmnet(x = x, y = y, family = family, ...)
   
   # predict responses for outcome
   # don't want to drop NAs here
