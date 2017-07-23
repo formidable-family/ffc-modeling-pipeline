@@ -3,17 +3,10 @@ library(glmnet)
 lasso <- function(data, outcome, covariates, family = "gaussian", ...) {
   # build covariate matrix and response vector
   f <- as.formula(paste0(outcome, " ~ ", paste0(covariates, collapse = " + ")))
-  x <- model.matrix(f, data = data)[, -1]
-  y <- na.omit(data[[outcome]])
-  
-  # alternatively
-  # y <- model.frame(f, data)[[outcome]]
-  
-  # or even
-  # d <- model.frame(f, data)
-  # x <- model.matrix(f, data = d)[, -1]
-  # y <- d[[outcome]]
-  
+  d <- model.frame(f, data)
+  x <- model.matrix(f, data = d)[, -1]
+  y <- d[[outcome]]
+
   # fit lasso model
   # alpha = 1 by default
   # (alpha is the mixing parameter for elastic net, so 1 = lasso)
