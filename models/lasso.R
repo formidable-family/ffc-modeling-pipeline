@@ -1,17 +1,32 @@
 library(glmnet)
 
-lasso <- function(data, outcome, covariates, family = "gaussian", ...) {
+lasso <- function(data, outcome, covariates, 
+                  scores = NULL, 
+                  family = "gaussian", ...) {
   # build covariate matrix and response vector
   f <- as.formula(paste0(outcome, " ~ ", paste0(covariates, collapse = " + ")))
   d <- model.frame(f, data)
   x <- model.matrix(f, data = d)[, -1]
   y <- d[[outcome]]
+  
+  # if scores are provided, convert to penalties for penalty.factor
+  # else use default penalty.factor of 1 for all covariates
+  penalties <- 
+    if (!is.null(scores)) {
+      calculate_penalty_factors(colnames(x), covariates, scores)
+    } else {
+      rep(1, length(colnames(x)))
+    }
 
   # fit lasso model
   # alpha = 1 by default
   # (alpha is the mixing parameter for elastic net, so 1 = lasso)
   model_fit <- 
-    cv.glmnet(x = x, y = y, family = family, type.measure = "mse", ...)
+    cv.glmnet(x = x, y = y, 
+              family = family, 
+              type.measure = "mse", 
+              penalty.factor = penalties, 
+              ...)
   
   # predict responses for outcome
   # don't want to drop NAs here
