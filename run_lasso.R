@@ -38,7 +38,7 @@ families <- as.list(c(rep("gaussian", 3),
                       rep("binomial", 3)))
 
 prediction_list <- 
-  Map(f = function(...) lasso(data = ffc, ..., parallel = TRUE), 
+  Map(f = function(...) lasso(data = ffc, ..., parallel = TRUE)$pred, 
       outcome = outcomes, 
       covariates = covariates, 
       family = families)

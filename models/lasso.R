@@ -10,7 +10,8 @@ lasso <- function(data, outcome, covariates, family = "gaussian", ...) {
   # fit lasso model
   # alpha = 1 by default
   # (alpha is the mixing parameter for elastic net, so 1 = lasso)
-  model_fit <- cv.glmnet(x = x, y = y, family = family, ...)
+  model_fit <- 
+    cv.glmnet(x = x, y = y, family = family, type.measure = "mse", ...)
   
   # predict responses for outcome
   # don't want to drop NAs here
@@ -22,8 +23,9 @@ lasso <- function(data, outcome, covariates, family = "gaussian", ...) {
   # in-sample mean squared error
   mse <- mean((data[[outcome]] - pred)^2, na.rm = TRUE)
   print(mse)
-  # could return pred + mse
-  # list(pred = pred, mse = mse)
+  # could return pred + mse + model
+  # list(pred = pred, mse = mse, model = model_fit)
   
-  pred
+  # pred
+  list(pred = pred, mse = mse, model = model_fit, formula = f)
 }
