@@ -7,6 +7,7 @@ registerDoParallel(cores = parallel::detectCores(logical = FALSE))
 # https://stackoverflow.com/a/21710769
 # https://stackoverflow.com/a/29001039
 
+source("models/calculate_penalty_factors.R")
 source("models/lasso.R")
 
 # data ----
@@ -18,21 +19,27 @@ source("https://raw.githubusercontent.com/ccgilroy/ffc-data-processing/master/R/
 ffc <- merge_train(imputed_background, train)
 
 # covariates ----
+ffvars_scored <- read_csv(file.path("variables", "ffvars_scored.csv"))
 
-gpa_vars <- read_csv(file.path("variables", "<FILENAME>"))
-grit_vars <- read_csv(file.path("variables", "<FILENAME>"))
-materialHardship_vars <- read_csv(file.path("variables", "<FILENAME>"))
-eviction_vars <- read_csv(file.path("variables", "<FILENAME>"))
-layoff_vars <- read_csv(file.path("variables", "<FILENAME>"))
-jobTraining_vars <- read_csv(file.path("variables", "<FILENAME>"))
+gpa_vars <- ffvars_scored %>% filter(outcome == "gpa")
+grit_vars <- ffvars_scored %>% filter(outcome == "grit")
+materialHardship_vars <- ffvars_scored %>% filter(outcome == "material_hardship")
+eviction_vars <- ffvars_scored %>% filter(outcome == "eviction")
+layoff_vars <- ffvars_scored %>% filter(outcome == "layoff")
+jobTraining_vars <- ffvars_scored %>% filter(outcome == "job_training")
 
 # models ----
-
 outcomes <- list("gpa", "grit", "materialHardship", 
                  "eviction", "layoff", "jobTraining")
 
-covariates <- list(gpa_vars, grit_vars, materialHardship_vars, 
-                   eviction_vars, layoff_vars, jobTraining_vars)
+vars_data_list <- list(gpa_vars, grit_vars, materialHardship_vars, 
+                       eviction_vars, layoff_vars, jobTraining_vars)
+names(vars_data_list) <- as.character(outcomes)
+
+covariates <- map(vars_data_list, "ffvar")
+
+scores_experts <- map(vars_data_list, "experts")
+scores_mturks <- map(vars_data_list, "mturks")
 
 families <- as.list(c(rep("gaussian", 3), 
                       rep("binomial", 3)))
