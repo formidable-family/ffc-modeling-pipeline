@@ -3,6 +3,15 @@ library(glmnet)
 lasso <- function(data, outcome, covariates, 
                   scores = NULL, 
                   family = "gaussian", ...) {
+  
+  # validation of input
+  if (!is.null(scores)) {
+    # only use scores for covariates that are in the provided data
+    scores <- scores[which(covariates %in% colnames(data))]
+  }
+  # only use covariates that are in the provided data
+  covariates <- covariates[covariates %in% colnames(data)]
+  
   # build covariate matrix and response vector
   f <- as.formula(paste0(outcome, " ~ ", paste0(covariates, collapse = " + ")))
   d <- model.frame(f, data)
@@ -37,7 +46,8 @@ lasso <- function(data, outcome, covariates,
   
   # in-sample mean squared error
   mse <- mean((data[[outcome]] - pred)^2, na.rm = TRUE)
-  print(mse)
+  print(paste0("in-sample mse for ", outcome, ": ", 
+               formatC(mse, digits = 5, format = "f")))
   # could return pred + mse + model
   # list(pred = pred, mse = mse, model = model_fit)
   
