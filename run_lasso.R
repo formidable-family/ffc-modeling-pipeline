@@ -10,36 +10,21 @@ registerDoParallel(cores = parallel::detectCores(logical = FALSE))
 source("models/calculate_penalty_factors.R")
 source("models/lasso.R")
 
+source("utils/validate_imputed_background.R")
+source("utils/zip_prediction.R")
+
+source("https://raw.githubusercontent.com/ccgilroy/ffc-data-processing/master/R/merge_train.R")
+
 # data ----
 train <- read_csv(file.path("data", "train.csv"))
 imputed_background <- readRDS(file.path("data", "imputed-fulldata-lasso.rds"))
 
-# handling for issues with imputed data
-# if the imputed data has no challengeID column, add one
-if (!"challengeID" %in% colnames(imputed_background)) {
-  challengeID <- data_frame(challengeID = 1:nrow(imputed_background))
-  imputed_background <- bind_cols(challengeID, imputed_background)
-}
+# handle potential issues with imputed data
+# adds a challengeID column if necessary
+# removes any columns that still have NAs
+# converts categorical variables to factors
+imputed_background <- validate_imputed_background(imputed_background)
 
-# if the imputed data still has columns with NAs, get rid of those columns
-na_check <- sapply(imputed_background, function(x) any(is.na(x)))
-still_nas <- names(na_check[na_check])
-imputed_background <- imputed_background %>% select(-one_of(still_nas))
-
-# convert categorical variables to factors
-categorical_vars <- read_lines("https://raw.githubusercontent.com/ccgilroy/ffc-data-processing/master/output/categorical.txt")
-categorical_vars <- 
-  categorical_vars[categorical_vars %in% colnames(imputed_background)]
-
-d1 <- imputed_background %>% select(-one_of(categorical_vars))
-d2 <- 
-  imputed_background %>%
-  select(one_of(categorical_vars)) %>%
-  Map(as.factor, .)
-
-imputed_background <- bind_cols(d1, d2)
-
-source("https://raw.githubusercontent.com/ccgilroy/ffc-data-processing/master/R/merge_train.R")
 ffc <- merge_train(imputed_background, train)
 
 # covariates ----
@@ -79,12 +64,20 @@ prediction_list <-
       covariates = covariates, 
       family = families)
 
-# with score information
-prediction_list2 <- 
+# with expert score information
+prediction_list_experts <- 
   Map(f = function(...) lasso(data = ffc, ..., parallel = TRUE)$pred, 
       outcome = outcomes, 
       covariates = covariates, 
       scores = scores_experts,
+      family = families)
+
+# with mturk score information
+prediction_list_mturks <- 
+  Map(f = function(...) lasso(data = ffc, ..., parallel = TRUE)$pred, 
+      outcome = outcomes, 
+      covariates = covariates, 
+      scores = scores_mturks,
       family = families)
 
 # predictions ----
@@ -94,10 +87,20 @@ prediction <-
   select(challengeID) %>%
   bind_cols(prediction_list)
 
-if (!dir.exists("predictions")) dir.create("predictions")
+names(prediction_list_experts) <- as.character(outcomes)
+prediction_experts <- 
+  ffc %>% 
+  select(challengeID) %>%
+  bind_cols(prediction_list_experts)
 
-pred_path <- file.path("predictions", "test_prediction")
-if (!dir.exists(pred_path)) dir.create(pred_path)
+names(prediction_list_mturks) <- as.character(outcomes)
+prediction_mturks <- 
+  ffc %>% 
+  select(challengeID) %>%
+  bind_cols(prediction_list_mturks)
 
-write_csv(prediction, file.path(pred_path, "prediction.csv"))
-
+# output ----
+# write to csv and zip for submission
+zip_prediction(prediction, "lasso_regression_imputation")
+zip_prediction(prediction_experts, "lasso_regression_imputation_experts")
+zip_prediction(prediction_mturks, "lasso_regression_imputation_mturks")
