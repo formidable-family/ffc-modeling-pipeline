@@ -10,12 +10,15 @@ generate_foldid <- function(data, outcome, test_indices) {
 }
 
 setup_lasso <- function(data, outcome, covariates) {
+  # using model.matrix instead of sparse.model.matrix
+  # prevents a warning from caret about turning data into a data frame
+  
   # only use covariates that are in the provided data
   covariates <- covariates[covariates %in% colnames(data)]
   
   f <- as.formula(paste0(outcome, " ~ ", paste0(covariates, collapse = " + ")))
   d <- model.frame(f, data)
-  x <- sparse.model.matrix(f, data = d)[, -1]
+  x <- model.matrix(f, data = d)[, -1]
   y <- d[[outcome]]
   
   list(x = x, y = y)

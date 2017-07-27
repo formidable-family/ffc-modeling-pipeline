@@ -57,12 +57,16 @@ scores_mturks <- map(vars_data_list, "mturks")
 families <- as.list(c(rep("gaussian", 3), 
                       rep("binomial", 3)))
 
+# alphas closer to 0 seem to do slightly better (more ridge than lasso)
+alphas <- as.list(c(0.05, 0.10, 0.025, 0.15, 0.05, 0.05))
+
 # without score information
 prediction_list <- 
   Map(f = function(...) lasso(data = ffc, ..., parallel = TRUE)$pred, 
       outcome = outcomes, 
       covariates = covariates, 
-      family = families)
+      family = families, 
+      alpha = alphas)
 
 # with expert score information
 prediction_list_experts <- 
@@ -70,7 +74,8 @@ prediction_list_experts <-
       outcome = outcomes, 
       covariates = covariates, 
       scores = scores_experts,
-      family = families)
+      family = families, 
+      alpha = alphas)
 
 # with mturk score information
 prediction_list_mturks <- 
@@ -78,7 +83,8 @@ prediction_list_mturks <-
       outcome = outcomes, 
       covariates = covariates, 
       scores = scores_mturks,
-      family = families)
+      family = families, 
+      alpha = alphas)
 
 # predictions ----
 names(prediction_list) <- as.character(outcomes)
