@@ -62,6 +62,8 @@ vars_data_list <- list(gpa_vars, grit_vars, materialHardship_vars,
                        eviction_vars, layoff_vars, jobTraining_vars)
 names(vars_data_list) <- as.character(outcomes)
 
+all_covariates <- rep(list(colnames(imputed_background)[-1]), 6)
+
 covariates <- map(vars_data_list, "ffvar")
 
 scores_experts <- map(vars_data_list, "experts")

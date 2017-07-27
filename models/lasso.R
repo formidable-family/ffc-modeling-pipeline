@@ -15,7 +15,7 @@ lasso <- function(data, outcome, covariates,
   # build covariate matrix and response vector
   f <- as.formula(paste0(outcome, " ~ ", paste0(covariates, collapse = " + ")))
   d <- model.frame(f, data)
-  x <- model.matrix(f, data = d)[, -1]
+  x <- sparse.model.matrix(f, data = d)[, -1]
   y <- d[[outcome]]
   
   # if scores are provided, convert to penalties for penalty.factor
@@ -41,7 +41,7 @@ lasso <- function(data, outcome, covariates,
   # don't want to drop NAs here
   # https://stackoverflow.com/a/31949950
   x_pred <- 
-    model.matrix(f, data = model.frame(~ ., data, na.action = na.pass))[, -1]
+    sparse.model.matrix(f, data = model.frame(~ ., data, na.action = na.pass))[, -1]
   pred <- predict(model_fit, newx = x_pred, s = "lambda.min", type = "response")
   
   # in-sample mean squared error
