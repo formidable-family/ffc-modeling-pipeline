@@ -52,7 +52,7 @@ all_covariates <- rep(list(colnames(imputed_background)[-1]), 6)
 covariates <- map(vars_data_list, "ffvar")
 
 scores_experts <- map(vars_data_list, "experts")
-scores_mturks <- map(vars_data_list, "mturks")
+scores_mturkers <- map(vars_data_list, "mturkers")
 
 families <- as.list(c(rep("gaussian", 3), 
                       rep("binomial", 3)))
@@ -78,11 +78,11 @@ prediction_list_experts <-
       alpha = alphas)
 
 # with mturk score information
-prediction_list_mturks <- 
+prediction_list_mturkers <- 
   Map(f = function(...) lasso(data = ffc, ..., parallel = TRUE)$pred, 
       outcome = outcomes, 
       covariates = covariates, 
-      scores = scores_mturks,
+      scores = scores_mturkers,
       family = families, 
       alpha = alphas)
 
@@ -99,14 +99,14 @@ prediction_experts <-
   select(challengeID) %>%
   bind_cols(prediction_list_experts)
 
-names(prediction_list_mturks) <- as.character(outcomes)
-prediction_mturks <- 
+names(prediction_list_mturkers) <- as.character(outcomes)
+prediction_mturkers <- 
   ffc %>% 
   select(challengeID) %>%
-  bind_cols(prediction_list_mturks)
+  bind_cols(prediction_list_mturkers)
 
 # output ----
 # write to csv and zip for submission
 zip_prediction(prediction, "lasso_regression_imputation")
 zip_prediction(prediction_experts, "lasso_regression_imputation_experts")
-zip_prediction(prediction_mturks, "lasso_regression_imputation_mturks")
+zip_prediction(prediction_mturkers, "lasso_regression_imputation_mturkers")

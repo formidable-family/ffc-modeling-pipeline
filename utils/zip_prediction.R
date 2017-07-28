@@ -20,11 +20,11 @@ zip_prediction <- function(prediction, name) {
   file.copy("run_lasso.R", pred_path)
   file.copy("models/lasso.R", pred_path)
   
-  # cd into predictions directory is the best way to get the directory structure
-  # that I want the zip file to have. -j parameter junks the whole directory
-  # structure, -p (default) includes predictions/<name>/<files>
-  setwd("predictions")
-  zip(zipfile = name, 
-      files = list.files(name, full.names = TRUE))
-  setwd("..")
+  # cd all the way into the directory with the predictions before zipping
+  # then move zip file to predictions/ folder for convenience
+  # and restore working directory to project root
+  setwd(pred_path)
+  zip(zipfile = name, files = list.files())
+  file.rename(paste0(name, ".zip"), file.path("..", paste0(name, ".zip")))
+  setwd("../..")
 }
