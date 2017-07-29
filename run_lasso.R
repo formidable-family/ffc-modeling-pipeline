@@ -131,3 +131,6 @@ lasso_regression_imputation <-
 
 lasso_mean_imputation <- 
   run_lasso("meanmode_imputed.rds", "lasso_mean_imputation")
+
+lasso_regression_imputation_lm <- 
+  run_lasso("imputed-lm-vartype.rds", "lasso_regression_imputation_lm")
