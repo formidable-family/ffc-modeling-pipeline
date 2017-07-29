@@ -17,6 +17,9 @@ validate_imputed_background <- function(imputed_background,
   imputed_background <- imputed_background %>% select(-one_of(still_nas))
   
   # stop here if categorical_to_factor = FALSE
+  if (any(vapply(imputed_background, is.factor, logical(1)))) {
+    categorical_to_factor <- TRUE
+  }
   if (!categorical_to_factor) return(imputed_background)
   
   # convert categorical variables to factors
