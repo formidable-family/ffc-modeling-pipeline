@@ -128,3 +128,6 @@ run_lasso <- function(data_file_name, prediction_name) {
 
 lasso_regression_imputation <- 
   run_lasso("imputed-fulldata-lasso.rds", "lasso_regression_imputation")
+
+lasso_mean_imputation <- 
+  run_lasso("meanmode_imputed.rds", "lasso_mean_imputation")
