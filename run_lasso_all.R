@@ -74,4 +74,4 @@ prediction <-
   select(challengeID) %>%
   bind_cols(prediction_list)
 
-zip_prediction(prediction, prediction_name)
+zip_prediction(prediction, prediction_name, run_file = "run_lasso_all.R")

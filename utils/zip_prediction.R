@@ -1,6 +1,6 @@
 library(readr)
 
-zip_prediction <- function(prediction, name) {
+zip_prediction <- function(prediction, name, run_file = "run_lasso.R") {
   if (!dir.exists("predictions")) dir.create("predictions")
   
   # write prediction to csv
@@ -17,7 +17,7 @@ zip_prediction <- function(prediction, name) {
   }
   
   # copy code to prediction directory
-  file.copy("run_lasso.R", pred_path)
+  file.copy(run_file, pred_path)
   file.copy("models/lasso.R", pred_path)
   
   # cd all the way into the directory with the predictions before zipping
