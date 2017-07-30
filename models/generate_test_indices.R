@@ -23,3 +23,4 @@ setup_lasso <- function(data, outcome, covariates) {
   
   list(x = x, y = y)
 }
+
