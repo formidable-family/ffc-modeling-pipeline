@@ -63,9 +63,6 @@ alphas <- as.list(c(0.05, 0.10, 0.025, 0.15, 0.05, 0.05))
 # will return a list of lists of data frames
 # 15 data frames total
 # fitting 6 * 3 * 5 = 90 models
-# ... no point in caching x or x_pred because they don't get reused
-# (they're functions of the data and the covariates...)
-# that's a lie! -> reduces number of times to calculate to 30
 mi_prediction_list <- lapply(imputed_background$imputations, function(imp) {
   ffc <- merge_train(imp, train)
   

@@ -11,14 +11,14 @@ zip_prediction <- function(prediction, name, run_file = "run_lasso.R") {
   # copy narrative to prediction directory
   narrative <- file.path("narratives", name, "narrative.txt")
   if (file.exists(narrative)) {
-    file.copy(narrative, pred_path)
+    file.copy(narrative, pred_path, overwrite = TRUE)
   } else {
     warning("Please create a narrative.txt file for this prediction: ", name)
   }
   
   # copy code to prediction directory
-  file.copy(run_file, pred_path)
-  file.copy("models/lasso.R", pred_path)
+  file.copy(run_file, pred_path, overwrite = TRUE)
+  file.copy("models/lasso.R", pred_path, overwrite = TRUE)
   
   # cd all the way into the directory with the predictions before zipping
   # then move zip file to predictions/ folder for convenience
