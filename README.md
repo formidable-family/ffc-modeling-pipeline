@@ -66,7 +66,7 @@ Presently, these scripts produce 16 of 21 predictions:
 
 - run_lasso.R uses 3 data sets and produces 9 sets of predictions\*
 - run_lasso_mi.R uses 1 data set and produces 3 sets of predictions
-- all other scripts \*\*
+- all other scripts use 1 data set and produce 1 set of predictions\*\*
 
 The correspondences are shown in the following table:
 
