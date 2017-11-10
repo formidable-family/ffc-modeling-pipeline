@@ -56,8 +56,39 @@ Once `background_ffvars_amelia.rds` and `background_constructed_amelia.rds` are 
 
 ## Fitting models
 
-The scripts that use the intermediate data sets imputed above to produce zipped predictions are all of the form `run_lasso{_X}.R`.
+The scripts that use the intermediate data sets imputed above to produce zipped predictions are all of the form `run_lasso{_X}.R`. Run each script individually; some may take as long as 1-2 hours on a laptop with decent computing power. Comments in the code note computationally-intensive steps---models with larger numbers of covariates (e.g. in `run_lasso_all.R`) cache intermediate matrices for speed.
 
 These scripts source functions from the `models/` and `utils/` subdirectories; no code in those subdirectories needs to be run independently.
 
 `tune_alpha.R` was run once, interactively, to produce approximately optimal alpha values via a grid search. Because these values are hardcoded in the run_lasso scripts, `tune_alpha.R` does not need to be run again.
+
+Presently, these scripts produce 16 of 21 predictions:
+
+- run_lasso.R uses 3 data sets and produces 9 sets of predictions\*
+- run_lasso_mi.R uses 1 data set and produces 3 sets of predictions
+- all other scripts \*\*
+
+The correspondences are shown in the following table:
+
+| script                     | data input                        | prediction output                             |
+|----------------------------|-----------------------------------|-----------------------------------------------|
+| run_lasso.R                | imputed-fulldata-lasso.rds        | lasso_regression_imputation                   |
+| run_lasso.R                | imputed-fulldata-lasso.rds        | lasso_regression_imputation_experts           |
+| run_lasso.R                | imputed-fulldata-lasso.rds        | lasso_regression_imputation_mturkers          |
+| run_lasso.R                | imputed-lm-vartype.rds            | lasso_regression_imputation_lm                |
+| run_lasso.R                | imputed-lm-vartype.rds            | lasso_regression_imputation_lm_experts        |
+| run_lasso.R                | imputed-lm-vartype.rds            | lasso_regression_imputation_lm_mturkers       |
+| run_lasso.R                | meanmode_imputed.rds              | lasso_mean_imputation                         |
+| run_lasso.R                | meanmode_imputed.rds              | lasso_mean_imputation_experts                 |
+| run_lasso.R                | meanmode_imputed.rds              | lasso_mean_imputation_mturkers                |
+| run_lasso_all.R            | imputed-lm-vartype.rds            | lasso_lm_imputation_all_covariates            |
+| run_lasso_all_mean.R       | meanmode_imputed.rds              | lasso_mean_imputation_all_covariates          |
+| run_lasso_constructed.R    | imputed-lasso-constructed.rds     | lasso_lasso_imputation_constructed_covariates |
+| run_lasso_mi.R             | background_ffvars_amelia.rds      | lasso_amelia_imputation                       |
+| run_lasso_mi.R             | background_ffvars_amelia.rds      | lasso_amelia_imputation_experts               |
+| run_lasso_mi.R             | background_ffvars_amelia.rds      | lasso_amelia_imputation_mturkers              |
+| run_lasso_mi_constructed.R | background_constructed_amelia.rds | lasso_amelia_imputation_constructed           |
+
+\* This is where the untyped OLS predictions will be added.
+
+\*\* Two other models which were run at the end of the challenge are missing as well. These consist of simple substitutions of different data into existing scripts: imputed-fulldata-lasso.rds into run_lasso_all.R, and imputed-lm-vartype.rds into run_lasso_constructed.R.
